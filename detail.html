@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#fff8f2">
+  <title>여행 상세 — 틈</title>
+  <link rel="stylesheet" href="css/style.css"><link rel="stylesheet" href="css/pages/detail.css">
+</head>
+<body class="page">
+<header class="site-header"><div class="container header-inner"><a class="logo" href="index.html" aria-label="틈 홈">틈</a><div class="header-spacer"></div><a class="header-link" href="explore.html">여행지 둘러보기</a><a class="header-link" href="saved.html">저장한 틈</a><a class="my-pill" href="mypage.html" aria-label="마이 페이지">MY</a></div></header>
+<main id="detailMain">
+  <section class="detail-hero"><div class="container"><div class="detail-photo"><img id="detailImage" src="assets/images/seongsu.svg" alt="여행 이미지"><span class="plan-badge" id="detailBadge">여행 일정</span></div><div class="detail-summary"><div><p class="kicker" id="detailKicker">TEUM PLAN</p><h1 class="detail-title" id="detailTitle">여행 일정을 불러오는 중</h1><p class="section-copy" id="detailArea"></p><ul class="detail-warning-list" id="detailWarnings"></ul></div><aside class="summary-card"><div class="summary-time" id="detailTime">--:-- → --:--</div><div class="summary-grid"><div class="summary-mini"><span>총 소요시간</span><strong id="detailDuration">-</strong></div><div class="summary-mini"><span id="detailCostLabel">예상 교통비</span><strong id="detailCost">-</strong></div><div class="summary-mini"><span>장소</span><strong id="detailPlaceCount">-</strong></div><div class="summary-mini"><span>이동</span><strong id="detailTravel">-</strong></div></div><p class="return-note" id="detailReturnNote">귀가 시간까지 검증된 일정입니다.</p><button type="button" class="detail-save-button" id="saveTripDesktop">이 일정 저장하기</button></aside></div></div></section>
+  <section><div class="container detail-grid"><article class="timeline-card"><div class="timeline-heading"><h2 class="timeline-title">TIMELINE</h2><span class="timeline-duration" id="timelineDuration"></span></div><div id="timelineList"></div></article><aside class="map-card"><div class="map-placeholder" id="planMap" data-map-state="loading" aria-label="Kakao Map"><svg viewBox="0 0 800 640" aria-hidden="true"><path d="M110 155 C230 100 280 230 390 260 S560 350 670 480" fill="none" stroke="#f47769" stroke-width="6" stroke-linecap="round" stroke-dasharray="10 12" opacity=".75"/></svg><div class="map-caption">KAKAO MAP</div></div></aside></div></section>
+  <section class="route-diagnostic-section" id="routeDiagnosticSection" hidden><div class="container"><p class="kicker">Route diagnostics</p><h2 class="section-title">이동 경로 확인</h2><p class="section-copy">Kakao 대중교통 경로가 없는 가까운 구간은 도보로 전환하고, 그래도 확인되지 않은 구간만 거리 기반 예상값을 사용합니다.</p><div class="route-diagnostic-grid" id="routeDiagnosticGrid"></div></div></section>
+  <section class="place-section"><div class="container"><p class="kicker">TourAPI places</p><h2 class="section-title">이 일정에 들어간 장소</h2><div class="place-grid" id="placeGrid"></div></div></section>
+  <section class="lodging-section" id="lodgingSection" hidden><div class="container"><p class="kicker">Stay options</p><h2 class="section-title">일정 반영 숙소</h2><p class="section-copy" id="lodgingSectionCopy">아래 숙소는 모두 Day 1 체크인부터 Day 2 귀가까지 전체 일정 검증을 통과했습니다. 숙소를 선택하면 해당 숙소 기준 타임라인으로 즉시 바뀝니다.</p><div class="lodging-grid" id="lodgingGrid"></div></div></section>
+</main>
+<a href="#" class="sticky-save" id="saveTripMobile">이 일정 저장하기</a><div class="save-feedback" id="saveFeedback" role="status" aria-live="polite">저장했습니다.</div>
+<footer class="footer"><div class="container footer-inner"><span>TEUM · 하루에 여행 하나쯤.</span><span>POSTCARD STACK responsive prototype · v2</span></div></footer>
+<script type="module" src="js/pages/detailPage.js"></script>
+<script type="module" src="js/integration/headerAuth.js"></script>
+</body></html>

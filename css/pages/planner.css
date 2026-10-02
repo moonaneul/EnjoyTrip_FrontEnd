@@ -1,0 +1,20 @@
+.field-button{width:100%;height:100%;padding:0;border:0;background:transparent;text-align:left;color:inherit;cursor:pointer}
+.field input[type="time"]{width:100%;margin-top:2px;border:0;background:transparent;color:var(--text);font-size:15px;font-weight:700;outline:0}
+.planner-status{min-height:22px;margin:10px 2px 0;color:var(--muted);font-size:11px}
+.planner-status[data-state="error"]{color:var(--coral-dark);font-weight:700}
+.planner-status[data-state="success"]{color:var(--sage-dark);font-weight:700}
+.manual-origin{display:none;margin-top:12px;padding:14px;border:1px dashed var(--line-strong);border-radius:15px;background:#fffaf6}
+.manual-origin.active{display:block}
+.manual-origin-grid{display:grid;grid-template-columns:1.5fr .7fr .7fr;gap:8px}
+.manual-origin label{display:grid;gap:5px;color:var(--muted);font-size:10px;font-weight:700}
+.manual-origin input{min-height:42px;width:100%;border:1px solid var(--line);border-radius:11px;background:#fff;padding:0 11px;color:var(--text)}
+.manual-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.manual-actions button{min-height:38px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--muted);font-size:11px;font-weight:700}
+.manual-actions .manual-primary{border-color:transparent;background:var(--sage);color:#fff}
+.planner-submit{display:inline-flex;align-items:center;justify-content:center}
+.planner-submit[disabled]{opacity:.58;cursor:not-allowed;transform:none}
+@media(max-width:767px){.manual-origin-grid{grid-template-columns:1fr 1fr}.manual-origin-grid label:first-child{grid-column:1/-1}}
+.origin-picker{display:none;margin-top:12px;padding:16px;border:1px solid var(--line-strong);border-radius:18px;background:#fffaf6;box-shadow:var(--shadow-xs)}
+.origin-picker.active{display:block}.origin-picker-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.origin-picker-head>div{display:grid;gap:3px}.origin-picker-head strong{font-size:13px}.origin-picker-head span{color:var(--muted);font-size:10px}.origin-close{width:32px;height:32px;border:1px solid var(--line);border-radius:50%;background:#fff;color:var(--muted);font-size:19px;cursor:pointer}.origin-choice-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:13px}.origin-choice{display:grid;gap:3px;min-height:64px;padding:11px;text-align:left;border:1px solid var(--line);border-radius:13px;background:#fff;color:var(--text);cursor:pointer}.origin-choice strong{font-size:11px}.origin-choice span{color:var(--muted);font-size:9px}.quick-origin-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.quick-origin{min-height:34px;padding:0 11px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--muted);font-size:10px;font-weight:700;cursor:pointer}.quick-origin:hover{border-color:var(--sage);color:var(--sage-dark)}.origin-search-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end;margin-top:12px}.origin-search-row label,.manual-origin-grid label{display:grid;gap:5px;color:var(--muted);font-size:10px;font-weight:700}.origin-search-row input,.manual-origin-grid input{min-height:42px;width:100%;border:1px solid var(--line);border-radius:11px;background:#fff;padding:0 11px;color:var(--text)}.origin-picker .manual-origin-grid{grid-template-columns:1fr 1fr auto;align-items:end;margin-top:8px}.origin-picker .manual-primary{min-height:42px;padding:0 13px;border:0;border-radius:11px;background:var(--sage);color:#fff;font-size:10px;font-weight:700;white-space:nowrap}.origin-help{margin:9px 0 0;color:var(--muted);font-size:9px}.toggle[disabled]{opacity:.72;cursor:not-allowed}.toggle[disabled] .toggle-track{filter:saturate(.7)}
+@media(max-width:767px){.origin-choice-grid{grid-template-columns:1fr}.origin-search-row{grid-template-columns:1fr}.origin-picker .manual-origin-grid{grid-template-columns:1fr 1fr}.origin-picker .manual-origin-grid .manual-primary{grid-column:1/-1}}
+.trip-mood-label{margin:18px 0 -6px;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:.01em}

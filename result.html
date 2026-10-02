@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#fff8f2">
+  <title>추천 결과 — 틈</title>
+  <link rel="stylesheet" href="css/style.css"><link rel="stylesheet" href="css/pages/result.css">
+</head>
+<body class="page">
+<header class="site-header"><div class="container header-inner"><a class="logo" href="index.html" aria-label="틈 홈">틈</a><div class="header-spacer"></div><a class="header-link" href="explore.html">여행지 둘러보기</a><a class="header-link" href="saved.html">저장한 틈</a><a class="my-pill" href="mypage.html" aria-label="마이 페이지">MY</a></div></header>
+<main>
+  <section class="result-hero"><div class="container"><p class="kicker" id="resultKicker">Result</p><h1 id="resultHeadline">가능한 여행을 계산하고 있어요.</h1><div class="result-toolbar" id="resultToolbar"></div><p class="result-status" id="resultStatus" data-state="loading">이동시간과 귀가 가능 시간을 검증하는 중입니다.</p></div></section>
+  <section class="section"><div class="container">
+    <div class="postcard-grid" data-carousel id="resultGrid"></div>
+    <div class="carousel-indicator" data-indicator id="resultIndicator" aria-hidden="true"></div>
+    <div class="result-empty" id="resultEmpty"><h2>조건 안에서 만들 수 있는 일정이 없어요.</h2><p>시간을 늘리거나 출발 위치를 바꿔 다시 찾아보세요.</p><a href="index.html">조건 다시 정하기</a></div>
+    <p class="result-meta" id="resultMeta">실제 Kakao API 키가 없으면 이동시간은 명확히 예상값으로 표시됩니다.</p>
+  </div></section>
+</main>
+<footer class="footer"><div class="container footer-inner"><span>TEUM · 하루에 여행 하나쯤.</span><span>POSTCARD STACK responsive prototype · v2</span></div></footer>
+<script src="js/ui.js"></script><script type="module" src="js/pages/resultPage.js"></script>
+<script type="module" src="js/integration/headerAuth.js"></script>
+</body></html>

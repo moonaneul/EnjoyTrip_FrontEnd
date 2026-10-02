@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TEUM TourAPI Live Smoke</title>
+  <style>
+    body{font-family:system-ui,sans-serif;max-width:980px;margin:40px auto;padding:0 20px;line-height:1.6}
+    .actions{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
+    button{padding:10px 14px;cursor:pointer}
+    button:disabled{cursor:not-allowed;opacity:.55}
+    .ok{color:#0a6}.fail{color:#b22}.warn{color:#a66b00}
+    pre{padding:16px;background:#f5f5f5;overflow:auto;border-radius:10px;white-space:pre-wrap}
+    table{width:100%;border-collapse:collapse;margin-top:16px;font-size:14px}
+    th,td{padding:10px 8px;border-bottom:1px solid #ddd;text-align:left;vertical-align:top}
+    th{background:#fafafa}
+    code{font-size:.92em}
+  </style>
+</head>
+<body>
+  <h1>TourAPI Live Smoke</h1>
+  <p>서비스키 자체는 화면에 출력하지 않습니다. 기본 연결과 7개 사용자 카테고리를 실제 TourAPI로 검증합니다.</p>
+
+  <div class="actions">
+    <button id="run-basic">기본 API 테스트</button>
+    <button id="run-categories">7개 카테고리 실제 검증</button>
+    <button id="run-details">7개 상세 API 실제 검증</button>
+  </div>
+
+  <p id="status">대기 중</p>
+  <pre id="output"></pre>
+
+  <section id="category-section" hidden>
+    <h2>7개 카테고리 결과</h2>
+    <p>서울(<code>lDongRegnCd=11</code>)을 먼저 조회합니다. 서울에서 0건이면 해당 타입만 전국 조회로 한 번 더 확인합니다.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>카테고리</th>
+          <th>contentTypeId</th>
+          <th>결과</th>
+          <th>조회 범위</th>
+          <th>샘플</th>
+        </tr>
+      </thead>
+      <tbody id="category-body"></tbody>
+    </table>
+  </section>
+
+  <section id="detail-section" hidden>
+    <h2>7개 상세 API 결과</h2>
+    <p>각 카테고리에서 실제 장소 1개를 선택해 <code>detailCommon2</code>와 <code>detailIntro2</code>를 모두 호출합니다. 테스트 모드에서는 intro 실패를 fallback으로 숨기지 않습니다.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>카테고리</th>
+          <th>샘플 장소</th>
+          <th>상세 API</th>
+          <th>공통 필드</th>
+          <th>운영/타입별 정보</th>
+        </tr>
+      </thead>
+      <tbody id="detail-body"></tbody>
+    </table>
+  </section>
+
+  <script type="module">
+    import {
+      getRegions,
+      getSubregions,
+      searchPlaces,
+      getPlaceDetail,
+      PLACE_TYPE_TO_CONTENT_TYPE_ID,
+    } from '../js/api/tourApi.js';
+
+    const status = document.querySelector('#status');
+    const output = document.querySelector('#output');
+    const basicButton = document.querySelector('#run-basic');
+    const categoryButton = document.querySelector('#run-categories');
+    const detailButton = document.querySelector('#run-details');
+    const categorySection = document.querySelector('#category-section');
+    const categoryBody = document.querySelector('#category-body');
+    const detailSection = document.querySelector('#detail-section');
+    const detailBody = document.querySelector('#detail-body');
+
+    const CATEGORY_TESTS = Object.freeze([
+      { type: 'attraction', label: '관광', contentTypeId: '12' },
+      { type: 'culture', label: '문화', contentTypeId: '14' },
+      { type: 'event', label: '행사', contentTypeId: '15' },
+      { type: 'course', label: '코스', contentTypeId: '25' },
+      { type: 'lodging', label: '숙박', contentTypeId: '32' },
+      { type: 'shopping', label: '쇼핑', contentTypeId: '38' },
+      { type: 'food', label: '음식', contentTypeId: '39' },
+    ]);
+
+    function write(value) {
+      output.textContent += `${value}
+`;
+    }
+
+    function resetResult(message) {
+      status.className = '';
+      status.textContent = message;
+      output.textContent = '';
+    }
+
+    function setButtonsDisabled(disabled) {
+      basicButton.disabled = disabled;
+      categoryButton.disabled = disabled;
+      detailButton.disabled = disabled;
+    }
+
+    function escapeHtml(value = '') {
+      return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function addCategoryRow({ label, contentTypeId, state, scope, sample }) {
+      const row = document.createElement('tr');
+      const stateClass = state.startsWith('PASS') ? 'ok' : state.startsWith('WARN') ? 'warn' : 'fail';
+      row.innerHTML = `
+        <td>${escapeHtml(label)}</td>
+        <td><code>${escapeHtml(contentTypeId)}</code></td>
+        <td class="${stateClass}">${escapeHtml(state)}</td>
+        <td>${escapeHtml(scope)}</td>
+        <td>${escapeHtml(sample || '-')}</td>
+      `;
+      categoryBody.appendChild(row);
+    }
+
+    function yesNo(value) {
+      return value ? '있음' : '없음';
+    }
+
+    function addDetailRow({ label, sample, state, commonFields, introFields }) {
+      const row = document.createElement('tr');
+      const stateClass = state.startsWith('PASS') ? 'ok' : state.startsWith('WARN') ? 'warn' : 'fail';
+      row.innerHTML = `
+        <td>${escapeHtml(label)}</td>
+        <td>${escapeHtml(sample || '-')}</td>
+        <td class="${stateClass}">${escapeHtml(state)}</td>
+        <td>${escapeHtml(commonFields || '-')}</td>
+        <td>${escapeHtml(introFields || '-')}</td>
+      `;
+      detailBody.appendChild(row);
+    }
+
+    async function findSample(test) {
+      let scope = '서울';
+      let places = await searchPlaces(
+        { areaCode: '11', type: test.type, page: 1, size: 5 },
+        { cache: false, timeoutMs: 12000 },
+      );
+      if (places.length === 0) {
+        scope = '전국 fallback';
+        places = await searchPlaces(
+          { type: test.type, page: 1, size: 5 },
+          { cache: false, timeoutMs: 12000 },
+        );
+      }
+      return { scope, sample: places[0] || null };
+    }
+
+    function validateReturnedPlaces(places, expectedType, expectedContentTypeId) {
+      const mismatches = places.filter((place) => (
+        place.type !== expectedType || String(place.contentTypeId) !== expectedContentTypeId
+      ));
+      return mismatches;
+    }
+
+    async function runBasic() {
+      setButtonsDisabled(true);
+      resetResult('기본 TourAPI 호출 중...');
+      categorySection.hidden = true;
+      detailSection.hidden = true;
+
+      try {
+        const regions = await getRegions({ cache: false, timeoutMs: 12000 });
+        write(`PASS ldongCode2 시도: ${regions.length}개`);
+
+        const seoul = regions.find((item) => item.code === '11') || regions[0];
+        if (!seoul) throw new Error('시도 응답이 비어 있습니다.');
+        write(`샘플 시도: ${seoul.name} (${seoul.code})`);
+
+        const subregions = await getSubregions(seoul.code, { cache: false, timeoutMs: 12000 });
+        write(`PASS ldongCode2 구군: ${subregions.length}개`);
+
+        const places = await searchPlaces(
+          { areaCode: seoul.code, type: 'attraction', page: 1, size: 5 },
+          { cache: false, timeoutMs: 12000 },
+        );
+        write(`PASS areaBasedList2 관광지: ${places.length}개`);
+        places.slice(0, 5).forEach((place, index) => write(`${index + 1}. ${place.title} / ${place.address || '주소 없음'}`));
+
+        status.className = 'ok';
+        status.textContent = 'LIVE PASS — 실제 TourAPI 연결 성공';
+      } catch (error) {
+        console.error(error);
+        status.className = 'fail';
+        status.textContent = 'LIVE FAIL — 아래 오류를 확인하세요.';
+        write(`${error.name}: ${error.message}`);
+        if (error.resultCode) write(`resultCode: ${error.resultCode}`);
+        if (error.resultMsg) write(`resultMsg: ${error.resultMsg}`);
+      } finally {
+        setButtonsDisabled(false);
+      }
+    }
+
+    async function runCategories() {
+      setButtonsDisabled(true);
+      resetResult('7개 카테고리 실제 TourAPI 검증 중...');
+      categorySection.hidden = false;
+      detailSection.hidden = true;
+      categoryBody.textContent = '';
+
+      let passed = 0;
+      let warned = 0;
+      let failed = 0;
+
+      try {
+        for (const test of CATEGORY_TESTS) {
+          const mappedId = PLACE_TYPE_TO_CONTENT_TYPE_ID[test.type];
+          if (mappedId !== test.contentTypeId) {
+            failed += 1;
+            addCategoryRow({
+              ...test,
+              state: `FAIL mapping=${mappedId || '없음'}`,
+              scope: '-',
+              sample: '내부 contentTypeId 매핑 불일치',
+            });
+            write(`FAIL ${test.label}: 내부 mapping 불일치 (${mappedId} != ${test.contentTypeId})`);
+            continue;
+          }
+
+          try {
+            let scope = '서울';
+            let places = await searchPlaces(
+              { areaCode: '11', type: test.type, page: 1, size: 5 },
+              { cache: false, timeoutMs: 12000 },
+            );
+
+            if (places.length === 0) {
+              scope = '전국 fallback';
+              places = await searchPlaces(
+                { type: test.type, page: 1, size: 5 },
+                { cache: false, timeoutMs: 12000 },
+              );
+            }
+
+            if (places.length === 0) {
+              warned += 1;
+              addCategoryRow({
+                ...test,
+                state: 'WARN 0건',
+                scope,
+                sample: 'API 호출은 성공했지만 샘플 데이터 없음',
+              });
+              write(`WARN ${test.label} (${test.contentTypeId}): ${scope} 조회 결과 0건`);
+              continue;
+            }
+
+            const mismatches = validateReturnedPlaces(places, test.type, test.contentTypeId);
+            if (mismatches.length > 0) {
+              failed += 1;
+              const bad = mismatches[0];
+              addCategoryRow({
+                ...test,
+                state: 'FAIL 정규화 불일치',
+                scope,
+                sample: `${bad.title || '(제목 없음)'} → type=${bad.type}, id=${bad.contentTypeId}`,
+              });
+              write(`FAIL ${test.label}: 반환 Place의 type/contentTypeId 불일치`);
+              continue;
+            }
+
+            passed += 1;
+            const sample = places[0];
+            addCategoryRow({
+              ...test,
+              state: `PASS ${places.length}건`,
+              scope,
+              sample: `${sample.title || '(제목 없음)'}${sample.address ? ` / ${sample.address}` : ''}`,
+            });
+            write(`PASS ${test.label} (${test.contentTypeId}): ${scope} ${places.length}건 / ${sample.title || '(제목 없음)'}`);
+          } catch (error) {
+            failed += 1;
+            console.error(`[Category Test] ${test.label}`, error);
+            addCategoryRow({
+              ...test,
+              state: 'FAIL API 오류',
+              scope: '서울',
+              sample: `${error.name}: ${error.message}`,
+            });
+            write(`FAIL ${test.label} (${test.contentTypeId}): ${error.name} - ${error.message}`);
+          }
+        }
+
+        write('');
+        write(`SUMMARY PASS ${passed} / WARN ${warned} / FAIL ${failed}`);
+
+        if (failed === 0 && warned === 0 && passed === CATEGORY_TESTS.length) {
+          status.className = 'ok';
+          status.textContent = 'CATEGORY LIVE PASS — 7개 카테고리 실제 데이터 검증 성공';
+        } else if (failed === 0) {
+          status.className = 'warn';
+          status.textContent = `CATEGORY LIVE WARN — PASS ${passed}, 데이터 0건 ${warned}`;
+        } else {
+          status.className = 'fail';
+          status.textContent = `CATEGORY LIVE FAIL — PASS ${passed}, WARN ${warned}, FAIL ${failed}`;
+        }
+      } finally {
+        setButtonsDisabled(false);
+      }
+    }
+
+    async function runDetails() {
+      setButtonsDisabled(true);
+      resetResult('7개 카테고리 detailCommon2 + detailIntro2 실제 검증 중...');
+      categorySection.hidden = true;
+      detailSection.hidden = false;
+      detailBody.textContent = '';
+
+      let passed = 0;
+      let warned = 0;
+      let failed = 0;
+
+      try {
+        for (const test of CATEGORY_TESTS) {
+          try {
+            const { scope, sample } = await findSample(test);
+            if (!sample) {
+              warned += 1;
+              addDetailRow({
+                label: test.label,
+                sample: '-',
+                state: 'WARN 샘플 0건',
+                commonFields: '-',
+                introFields: `${scope}에서도 샘플을 찾지 못함`,
+              });
+              write(`WARN ${test.label}: 상세 검증용 샘플 0건`);
+              continue;
+            }
+
+            const detail = await getPlaceDetail(
+              sample.contentId,
+              sample.contentTypeId,
+              { cache: false, timeoutMs: 12000, strictIntro: true },
+            );
+
+            const identityOk = (
+              detail.contentId === sample.contentId
+              && detail.contentTypeId === test.contentTypeId
+              && detail.type === test.type
+              && Boolean(detail.title)
+            );
+
+            if (!identityOk) {
+              failed += 1;
+              addDetailRow({
+                label: test.label,
+                sample: `${sample.title} (${scope})`,
+                state: 'FAIL 상세 정규화 불일치',
+                commonFields: `id=${detail.contentId}, type=${detail.type}, contentTypeId=${detail.contentTypeId}`,
+                introFields: '-',
+              });
+              write(`FAIL ${test.label}: detailCommon2 정규화 결과 불일치`);
+              continue;
+            }
+
+            passed += 1;
+            const commonFields = [
+              `주소 ${yesNo(detail.address)}`,
+              `이미지 ${yesNo(detail.imageUrl)}`,
+              `전화 ${yesNo(detail.tel)}`,
+              `설명 ${yesNo(detail.overview)}`,
+              `좌표 ${detail.lat !== null && detail.lng !== null ? '있음' : '없음'}`,
+            ].join(' · ');
+
+            let introFields = '';
+            if (test.type === 'course') {
+              introFields = 'detailIntro2 PASS · 코스는 현재 UI 운영시간 매핑 대상 아님';
+            } else {
+              introFields = [
+                `운영정보 ${yesNo(detail.openInfo?.text)}`,
+                `휴무정보 ${yesNo(detail.openInfo?.restDate)}`,
+                'detailIntro2 PASS',
+              ].join(' · ');
+            }
+
+            addDetailRow({
+              label: test.label,
+              sample: `${detail.title} (${scope})`,
+              state: 'PASS common + intro',
+              commonFields,
+              introFields,
+            });
+            write(`PASS ${test.label} (${test.contentTypeId}): ${detail.title} / detailCommon2 + detailIntro2`);
+          } catch (error) {
+            failed += 1;
+            console.error(`[Detail Test] ${test.label}`, error);
+            addDetailRow({
+              label: test.label,
+              sample: '-',
+              state: 'FAIL 상세 API 오류',
+              commonFields: `${error.name}: ${error.message}`,
+              introFields: error.endpoint ? `endpoint=${error.endpoint}` : '-',
+            });
+            write(`FAIL ${test.label} (${test.contentTypeId}): ${error.name} - ${error.message}`);
+          }
+        }
+
+        write('');
+        write(`DETAIL SUMMARY PASS ${passed} / WARN ${warned} / FAIL ${failed}`);
+
+        if (failed === 0 && warned === 0 && passed === CATEGORY_TESTS.length) {
+          status.className = 'ok';
+          status.textContent = 'DETAIL LIVE PASS — 7개 타입 common + intro 실제 검증 성공';
+        } else if (failed === 0) {
+          status.className = 'warn';
+          status.textContent = `DETAIL LIVE WARN — PASS ${passed}, 샘플 없음 ${warned}`;
+        } else {
+          status.className = 'fail';
+          status.textContent = `DETAIL LIVE FAIL — PASS ${passed}, WARN ${warned}, FAIL ${failed}`;
+        }
+      } finally {
+        setButtonsDisabled(false);
+      }
+    }
+
+    basicButton.addEventListener('click', runBasic);
+    categoryButton.addEventListener('click', runCategories);
+    detailButton.addEventListener('click', runDetails);
+  </script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fff8f2">
+  <title>여행지 둘러보기 — 틈</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/pages/explore.css">
+</head>
+<body class="page explore-page">
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="logo" href="index.html" aria-label="틈 홈">틈</a>
+    <div class="header-spacer"></div>
+    <a class="header-link" href="explore.html" aria-current="page">여행지 둘러보기</a>
+    <a class="header-link" href="login.html">로그인</a>
+    <a class="my-pill" href="mypage.html" aria-label="마이 페이지">MY</a>
+  </div>
+</header>
+
+<main>
+  <section class="explore-hero">
+    <div class="container explore-hero-grid">
+      <div>
+        <p class="kicker">TourAPI discovery</p>
+        <h1>오늘의 틈에 어울리는<br>여행지를 찾아보세요.</h1>
+        <p class="explore-lead">한국관광공사 관광정보를 지역과 여행 유형으로 가볍게 둘러볼 수 있어요.</p>
+      </div>
+      <div class="explore-stamp" aria-hidden="true">FIND<br>A PLACE</div>
+    </div>
+  </section>
+
+  <section class="explore-section">
+    <div class="container">
+      <form class="explore-filter" id="explore-form">
+        <div class="filter-row">
+          <label class="filter-field">
+            <span class="filter-label">지역</span>
+            <select id="region-select" required>
+              <option value="">지역을 선택해주세요</option>
+            </select>
+          </label>
+
+          <label class="filter-field">
+            <span class="filter-label">시·군·구</span>
+            <select id="subregion-select" disabled>
+              <option value="">전체</option>
+            </select>
+          </label>
+        </div>
+
+        <fieldset class="category-fieldset">
+          <legend>어떤 곳을 찾고 있나요?</legend>
+          <div class="explore-categories" id="category-buttons">
+            <button type="button" class="explore-category active" data-place-type="attraction" aria-pressed="true">관광</button>
+            <button type="button" class="explore-category" data-place-type="food" aria-pressed="false">음식</button>
+            <button type="button" class="explore-category" data-place-type="lodging" aria-pressed="false">숙박</button>
+            <button type="button" class="explore-category" data-place-type="culture" aria-pressed="false">문화</button>
+            <button type="button" class="explore-category" data-place-type="event" aria-pressed="false">행사</button>
+            <button type="button" class="explore-category" data-place-type="course" aria-pressed="false">코스</button>
+            <button type="button" class="explore-category" data-place-type="shopping" aria-pressed="false">쇼핑</button>
+          </div>
+        </fieldset>
+
+        <div class="filter-actions">
+          <p class="filter-help">지역을 고르면 해당 지역의 관광정보를 불러옵니다.</p>
+          <button class="search-button" type="submit">여행지 찾기 →</button>
+        </div>
+      </form>
+
+      <section class="explore-results" aria-labelledby="results-title">
+        <div class="results-head">
+          <div>
+            <p class="kicker">Postcards from Korea</p>
+            <h2 class="section-title" id="results-title">여행지 엽서</h2>
+          </div>
+          <p class="results-summary" id="results-summary">지역을 선택하면 여행지를 보여드릴게요.</p>
+        </div>
+
+        <div class="explore-state" id="explore-state" role="status" aria-live="polite">
+          <div class="state-postmark" aria-hidden="true">TEUM</div>
+          <strong>어디로 떠나볼까요?</strong>
+          <span>위에서 지역과 카테고리를 선택해보세요.</span>
+        </div>
+
+        <div class="place-grid" id="place-grid" hidden></div>
+
+        <div class="load-more-wrap" id="load-more-wrap" hidden>
+          <button class="load-more-button" type="button" id="load-more-button">조금 더 둘러보기</button>
+        </div>
+      </section>
+    </div>
+  </section>
+</main>
+
+<footer class="explore-footer">
+  <div class="container">관광정보 출처: 한국관광공사 TourAPI · 틈은 Front-end 학습용 프로젝트입니다.</div>
+</footer>
+
+<script type="module" src="js/pages/explorePage.js"></script>
+<script type="module" src="js/integration/headerAuth.js"></script>
+</body>
+</html>

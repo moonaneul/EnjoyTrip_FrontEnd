@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fff8f2">
+  <title>여행지 상세 — 틈</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/pages/explore.css">
+</head>
+<body class="page place-page">
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="logo" href="index.html" aria-label="틈 홈">틈</a>
+    <div class="header-spacer"></div>
+    <a class="header-link" href="explore.html">여행지 둘러보기</a>
+    <a class="header-link" href="login.html">로그인</a>
+    <a class="my-pill" href="mypage.html" aria-label="마이 페이지">MY</a>
+  </div>
+</header>
+
+<main class="place-main">
+  <div class="container">
+    <a class="back-link" href="explore.html">← 여행지 목록으로</a>
+
+    <div class="place-state" id="place-state" hidden role="status" aria-live="polite">
+      <span class="state-spinner" aria-hidden="true"></span>
+      <strong>여행지 정보를 불러오고 있어요.</strong>
+    </div>
+
+    <article class="place-detail" id="place-detail">
+      <div class="place-hero-card">
+        <div class="place-detail-photo no-image" id="place-detail-photo">대표 이미지가 제공되지 않은 여행지예요.</div>
+        <div class="place-postmark" aria-hidden="true">TEUM<br>KOREA</div>
+      </div>
+
+      <div class="place-detail-copy">
+        <p class="place-type-label" id="place-type-label">문화 · TOURAPI</p>
+        <h1 id="place-title">가나아트센터</h1>
+        <p class="place-address" id="place-address">서울특별시 종로구 평창30길 28 (평창동)</p>
+
+        <div class="place-meta" id="place-meta"><span class="place-meta-chip">좌표 정보 있음</span><span class="place-meta-chip">한국관광공사 데이터</span></div>
+
+        <div class="paper-rule"></div>
+
+        <section class="place-info-section">
+          <p class="kicker">Before you go</p>
+          <h2>방문 전 확인</h2>
+          <dl class="visit-info">
+            <div>
+              <dt>이용·영업 정보</dt>
+              <dd id="place-open-time">화요일~일요일 10:00~19:00</dd>
+            </div>
+            <div>
+              <dt>휴무</dt>
+              <dd id="place-rest-date">매주 월요일</dd>
+            </div>
+          </dl>
+          <p class="unknown-notice">TourAPI에 확인 가능한 정보만 표시하며, 현재 영업 여부를 임의로 판단하지 않습니다.</p>
+        </section>
+
+        <section class="place-info-section" id="overview-section">
+          <p class="kicker">About this place</p>
+          <h2>이곳은 어떤 곳인가요?</h2>
+          <p class="place-overview" id="place-overview">반응형 상세 설명 테스트입니다. 긴 설명이 모바일 화면에서도 가로 스크롤 없이 자연스럽게 줄바꿈되어야 합니다. 관광정보는 API에서 제공되는 내용만 표시합니다.</p>
+        </section>
+      </div>
+    </article>
+  </div>
+</main>
+
+<footer class="explore-footer">
+  <div class="container">관광정보 출처: 한국관광공사 TourAPI</div>
+</footer>
+
+</body>
+</html>

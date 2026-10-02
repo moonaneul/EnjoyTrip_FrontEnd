@@ -1,0 +1,15 @@
+{
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "node dev-server.mjs",
+    "test": "node tests/dev2.test.js && node js/features/explore/placeNormalizer.test.mjs && node tests/integration.test.js && node tests/auth-preference.test.js",
+    "test:dev2": "node tests/dev2.test.js",
+    "test:dev1": "node js/features/explore/placeNormalizer.test.mjs",
+    "test:integration": "node tests/integration.test.js",
+    "check": "node scripts/integration-check.mjs && npm test",
+    "smoke:kakao": "node scripts/kakao-smoke.mjs",
+    "smoke:tour": "node scripts/tourapi-smoke.mjs",
+    "test:auth-preference": "node tests/auth-preference.test.js"
+  }
+}
